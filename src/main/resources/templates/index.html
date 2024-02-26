@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<link rel ="stylesheet" href="index.css">
+
+<body>
+<h1>오늘의 DGF</h1>
+<ul id="post-list"></ul>
+
+<table id = "TEMP1">
+  <caption>Developers Rating</caption>
+  <thead>
+  <tr>
+    <th>초상화</th>
+    <th>캐릭터명</th>
+    <th>명성</th>
+    <th>전투력</th>
+    <th>Control</th>
+  </tr>
+  </thead>
+  <form id ="GRID1">
+  <tbody>
+
+    <button type="button" class="form-control flatpickr-basic" onclick="addSearchKey()">
+      캐릭터 추가
+    </button>
+
+  </tbody>
+  </form>
+  <tfoot>
+  <td colspan="5" class="tablefoot"></td>
+  </tfoot>
+</table>
+
+
+<script>
+
+  $(document).ready(function() {
+    getData();
+  });
+
+
+  $(document).on("click", "#savebtn", function() {
+      // 클릭된 버튼의 부모 요소인 행(tr)을 선택
+      var tr = $(this).closest("tr");
+      // 행(tr)의 자식 요소들(td) 선택
+      var td = tr.children();
+      console.log('td',td);
+
+
+      var id = td.eq(0).find('#id').val();
+      var characterName = td.eq(2).find("#characterName").val();
+      var level = td.eq(3).find("#level").val();
+      var power = td.eq(4).find("#power").val();
+
+
+      console.log('ID : ', id);
+      console.log("Character Name:", characterName);
+      console.log("Level:", level);
+      console.log("Power:", power);
+
+      let formData = {};
+      formData.characterName = characterName;
+      formData.level = level;
+      formData.power = power;
+
+    console.log('SAVE 보낼 DATA', formData);
+    $.ajax({
+      url: '/api/posts',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+        console.log('성공적으로 요청을 보냈습니다.');
+        console.log(response);
+        alert('저장되었습니다.');
+        window.location.reload();
+      },
+      error: function (xhr, status, error) {
+        console.error('요청이 실패했습니다.');
+        console.error(error);
+      }
+    });
+  });
+
+  $(document).on("click", "#delbtn", function() {
+    // 클릭된 버튼의 부모 요소인 행(tr)을 선택
+    var tr = $(this).closest("tr");
+    // 행(tr)의 자식 요소들(td) 선택
+    var td = tr.children();
+    console.log('td',td);
+
+    var id = td.eq(0).find('#id').val();
+
+    console.log('ID : ', id);
+
+    $.ajax({
+      url: '/api/posts',
+      type: 'DELETE',
+      data: id,
+      success: function (response) {
+        console.log('성공적으로 요청을 보냈습니다.');
+        console.log(response);
+        alert('저장되었습니다.');
+        window.location.reload();
+      },
+      error: function (xhr, status, error) {
+        console.error('요청이 실패했습니다.');
+        console.error(error);
+      }
+    });
+  });
+
+
+  function addSearchKey() {
+
+    var rowItem = `
+        <tr>
+        <input type="hidden" id="id" name="id">
+          <td><img src=""></td>
+          <td>
+            <input type="text" className="form-control flatpickr-basic" id="characterName" name="characterName" />
+          </td>
+          <td>
+            <input type="text" className="form-control flatpickr-basic" id="level" name="level" />
+          </td>
+          <td> <input type="text" className="form-control flatpickr-basic" id="power" name="power" /> </td>
+          <td>
+          </td>
+      <td>
+        <button className="view" type="button"  name="savebtn" id="savebtn">저장</button>
+        <button className="delete" type="button" name="delbtn" id="delbtn">삭제</button>
+      </td>
+       </tr>
+    `;
+
+    $('#TEMP1').append(rowItem);
+
+  }
+
+  function getData() {
+    $.ajax({
+      url: '/api/posts',
+      method: 'GET',
+      success: function(posts) {
+        // 서버에서 받은 게시물 목록을 화면에 표시
+        posts.forEach(function(item) {
+          console.log('posts', item);
+          var rowItem = `
+        <tr>
+        <input type="hidden" id="id" name="id">
+          <td><img src=""></td>
+          <td>
+            <input type="text" className="form-control flatpickr-basic" id="characterName" name="characterName" />
+          </td>
+          <td>
+            <input type="text" className="form-control flatpickr-basic" id="level" name="level" />
+          </td>
+          <td> <input type="text" className="form-control flatpickr-basic" id="power" name="power" /> </td>
+          <td>
+          </td>
+          <td>
+            <button className="view" type="button"  name="savebtn" id="savebtn">저장</button>
+            <button className="delete" type="button" name="delbtn" id="delbtn">삭제</button>
+          </td>
+       </tr>
+    `;
+          console.log('itemid',item.id);
+          var newRow = $('#TEMP1 tr:last');
+          newRow.find('.id').val(item.id);
+          newRow.find('.characterName').val(item.characterName);
+          newRow.find('.level').val(item.level);
+          newRow.find('.power').val(item.power);
+          $('#TEMP1').append(rowItem);
+
+        });
+      }
+    });
+  }
+
+  function gatherComponent(parentId, withDesc) {
+    //data-gbn 설정해서 필요한 값 객체화
+    let objects = {}; //txt,txtArea,checkbox,checkboxMulti,select,table,date,number,decimal
+    let objectsWithDesc = []; //필터 조건에서 사용되는 변수
+    $(parentId + ' [data-gbn]').each(function (index, item) {
+
+      let id = $(item).attr('id');
+      let gbn = $(item).attr('data-gbn');
+      let dataId = $(item).attr('data-id');
+      let dataPass = $(item).attr('data-pass');
+      let isSingleSearch = $(item).attr('isSingleSearch');
+      gbn = gbn.toLowerCase();
+      if (dataPass) {
+        return true;// continue
+      }
+      //기본 결과값은 val
+      let result = isEmpty($(item).val());
+      let desc = $(item).attr('data-desc');
+
+      if (gbn == 'checkboxmulti') {
+        //체크박스 멀티의 경우 체크 여부 배열에 담아 보낸다(안의 내용에 순서 제약이 생기는 문제 있음)
+        let strVal = '';
+        $(this).find('input').each(function (index, item) {
+          strVal += item.checked == true ? '1' : '0';
+        });
+        result = strVal;
+      } else if (gbn == 'select') {
+        //피커의 단일 셀렉트를 멀티로 변경하면서 생기는 오류 보정
+        // 왜 -1을 넣었는지 모르겠음 0429 권우석
+
+        result = $(item).attr('data-max-options') == 1 ? StringUtil.nvl(isEmpty($(item).val())[0],'') : isEmpty($(item).val());
+        // console.log(dataId+"="+result);
+        // result = $(item).attr('data-max-options') == 1 ? StringUtil.nvl(isEmpty($(item).val())[0],'-1') : isEmpty($(item).val());
+        //대펀 multiselect의 경우 구분값 추가할 필요 있음
+      } else if (gbn == 'checkbox') {
+        result = item.checked == true ? 'Y' : 'N';
+      } else if (gbn == 'date') {
+        result = result.replace(/[^0-9]/g, '');
+      } else if (gbn == 'radio') {
+        result = $("input:radio[name=" + dataId + "]:checked").val();
+      } else if (gbn == 'table') {
+        //data-provider-id = 해당 리얼그리드 dataProvider의 변수명을 넣어서 사용
+        let providerId = $(item).attr('data-provider-id');
+        let dp = eval(providerId);
+
+        let rowData = [];
+        let passFiedls = [];
+        //var settings = dataProvider.getFields()[0].tag;
+        let fields = dp.getFields();
+        $.each(fields, function (idx, data) {
+          if (data.tag) {
+            if (data.tag.data_pass) {
+              passFiedls.push(data.fieldName);
+            }
+          }
+        });
+        rowData = dp.getJsonRows();
+        rowData.forEach(element => {
+          passFiedls.forEach(function (arVal) {
+            delete element[arVal];
+          });
+        });
+        result = rowData;
+        //{data-id1:[{컬럼명1:값1,...},{컬럼명1:값1,...}],data-id2:[{컬럼명1:값1,...},{컬럼명1:값1,...}]}
+      } else if (gbn == 'file') { //활동사진은 data-gbn = file이므로 여기에 걸리게 된다.
+        //첨부파일
+        let fileList = [];
+        let fileDatas;
+        //
+        if(MapDropzone_files.containsKey(id)){
+          fileDatas = MapDropzone_files.get(id);
+        }
+        else if(MapDropzone_files.containsKey(dataId)){
+          fileDatas = MapDropzone_files.get(dataId);
+        }
+        //initDropzone 로 초기화 한 화면은 file_tab_main 로 강제 세팅되어있다.
+        else{
+          fileDatas = MapDropzone_files.get('file_tab_main');
+        }
+
+
+
+        if(fileDatas){
+          fileDatas.forEach(function (element) {
+            let fileObj = {};
+            fileObj.SEQ = element.seq;
+            fileObj.APNX_FNN = element.new_file;
+            fileObj.ORI_FNN = element.old_file;
+            fileObj.APNX_FSZ = element.size
+            fileObj.STR_DT = element.strDt;
+            fileObj.FILE_KIND_TPCD = element.fileKindTpcd;
+            fileObj.PRG_ID = element.prg_id;
+            fileObj.RPT_LP_TPCD = element.rptLpTpcd;
+            fileList.push(fileObj);
+          });
+        }
+        //위 키에서 다 없지만 첨부파일은 있다? DataID로 묶어준다.
+        else if(MapDropzone_files.keySet().length > 0){
+          MapDropzone_files.keySet().forEach(function (element) {
+            let temp = MapDropzone_files.get(element);
+            temp.forEach(function (element) {
+              let fileObj = {};
+              fileObj.SEQ = element.seq;
+              fileObj.APNX_FNN = element.new_file;
+              fileObj.ORI_FNN = element.old_file;
+              fileObj.APNX_FSZ = element.size
+              fileObj.STR_DT = element.strDt;
+              fileObj.FILE_KIND_TPCD = element.fileKindTpcd;
+              fileObj.PRG_ID = element.prg_id;
+              fileObj.RPT_LP_TPCD = element.rptLpTpcd;
+              fileList.push(fileObj);
+            });
+
+          });
+        }
+
+
+        result = fileList;
+      } else if (gbn == 'number' || gbn == 'decimal') {
+        result = StringUtil.removeComma(result);
+      } else if (gbn == 'synap') {
+        let editorId = item.dataset.editorId;
+        let edt = eval(editorId);
+        result = edt.getPublishingHtml();
+      }
+
+      //withDesc 해당 파라미터가 없으면 메인에서 불러온것
+      //다른 목적으로 호출했다면 예:)filter 모어 필터에서 사용됨
+      if (!withDesc) {
+        objects[dataId + ''] = result;
+      } else if (withDesc == 'filter') {
+        //data-desc 를 필터 설정 안하면 조회 조건으로 안보겠음
+        if (typeof desc != "undefined" && desc != null && desc != "") {
+          let temp = {};
+          let value = "";
+          //여, 부 는 강제로 값을 변경해야됨
+          let yn = '';
+          if (result == '여') yn = 'Y';
+          if (result == '부') yn = 'N';
+
+          if (gbn == 'select') {
+            if (item.selectedIndex >= 0) {
+              result = item.selectedOptions[0]['label'];
+            }
+          } else {
+            result = $(item).val();
+          }
+
+          // if(typeof result == 'undefined' || StringUtil.isNull(result)) { return true; }
+
+          // 태그는 value값을 키값으로 본다. 그러므로 중복 비허용하려면 temp.value에 desc만 넣으면 됨.
+          if (typeof isSingleSearch != "undefined" && isSingleSearch != null && isSingleSearch != "") {
+            temp.value = desc;
+          } else {
+            temp.value = desc + ' : ' + (yn.length > 0 ? yn : result);
+          }
+          temp.value = desc;
+
+          temp.id = '#' + dataId.toUpperCase();
+          temp.text = desc + ' : ' + (yn.length > 0 ? yn : result);
+          if (gbn == 'number' || gbn == 'decimal') {
+            temp.data = $(item).val().replaceAll(",","");
+
+          } else {
+            temp.data = yn.length > 0 ? yn : $(item).val();
+          }
+          temp.gbn = 'filter';
+          objectsWithDesc.push(temp);
+        }
+      }
+    });//forEach
+    //필터 조회용으로 모왔다면
+    if (withDesc) {
+      objects = objectsWithDesc;
+    }
+    return objects;
+  }
+
+</script>
+</body>
+</html>
