@@ -2,6 +2,8 @@ import React from 'react';
 import TodoListTemplate from './components/js/TodoListTemplate';
 import Form from './components/js/Form';
 import TodoItemList from './components/js/TodoItemList';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {Button} from "react-bootstrap";
 
 class App extends React.Component {
     constructor(props) {
@@ -197,6 +199,7 @@ class App extends React.Component {
                     todos={this.state.todos}
                     onToggle={this.handleToggle}
                     onRemove={this.handleRemove} />
+                <Button variant="primary">Boot strap</Button>
             </TodoListTemplate>
         );
     }
