@@ -3,7 +3,7 @@ import TodoListTemplate from './components/js/TodoListTemplate';
 import Form from './components/js/Form';
 import TodoItemList from './components/js/TodoItemList';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Button} from "react-bootstrap";
+import CardsG from "./components/js/CardG";
 
 class App extends React.Component {
     constructor(props) {
@@ -47,6 +47,7 @@ class App extends React.Component {
 
     // *** Form.js 에서 Hook(useState) 사용으로 인해 state 에서 input 을 제외하고
     // parameter 로 받는다.
+
     // 등록
     handleCreate(inputValue) {
         const { todos } = this.state;
@@ -195,11 +196,16 @@ class App extends React.Component {
                     onCreate={this.handleCreate}
                 />
             )}>
-                <TodoItemList
+                {/*<TodoItemList*/}
+                {/*    todos={this.state.todos}*/}
+                {/*    onToggle={this.handleToggle}*/}
+                {/*    onRemove={this.handleRemove} />*/}
+                <CardsG
                     todos={this.state.todos}
                     onToggle={this.handleToggle}
-                    onRemove={this.handleRemove} />
-                <Button variant="primary">Boot strap</Button>
+                    onRemove={this.handleRemove}
+                    />
+
             </TodoListTemplate>
         );
     }
