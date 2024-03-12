@@ -25,29 +25,30 @@ class App extends React.Component {
         this.handleInitInfo();
     }
 
-    handleInitInfo() {
+    handleInitInfo() { // 조회
         fetch("/api/posts")
             .then(res => res.json())
             .then(todos => this.setState({ todos: todos }))
             .catch(err => console.log(err));
     }
 
-    handleCreate(inputValue) {
+    handleCreate(inputValue) { // 생성
         const { todos } = this.state;
         if (inputValue === "") {
             alert("오늘 할 일을 입력해주세요!");
             return;
         }
-        const lastId = todos.length > 0 ? todos[todos.length - 1].id : -1;
+        const lastId = todos.length > 0 ? todos[todos.length - 1].id : -1; // todos에 값이 있다면 그 마지막 값의 id를, 없다면 -1을 부여.
         const nextId = lastId + 1;
         this.setState({
-            todos: todos.concat({
+            todos: todos.concat({ // react에서는 상태를 직접 수정하거나 변경하면 안되고 새로운 상태를 생성해야 하기에 concat으로 새로운 배열을 반환하는 방식을 사용, 이러한 방식을 사용하면 React가 변경을 감지하고 UI를 업데이트 할 수 있음.
                 id: nextId,
                 content: inputValue,
                 isComplete: false
             })
         });
         const param = {
+            "id" : nextId,
             "content": inputValue,
             "isComplete": false
         }
@@ -67,13 +68,13 @@ class App extends React.Component {
             .catch(err => console.log(err));
     }
 
-    handleToggle(id) {
+    handleToggle(id) { // 클릭시 이벤트
         const { todos } = this.state;
         const selectedTodo = todos.find(todo => todo.id === id);
         this.openModal(selectedTodo);
     }
 
-    handleRemove(id) {
+    handleRemove(id) { // 삭제 이벤트
         const { todos } = this.state;
         const removeContent = todos.find(todo => todo.id === id).content;
         if (!window.confirm("'" + removeContent + "' 을 삭제하시겠습니까?")) {
@@ -97,14 +98,15 @@ class App extends React.Component {
             .catch(err => console.log(err));
     }
 
-    openModal(selectedTodo) {
+    openModal(selectedTodo) { // 모달 오픈
+        console.log('Open Modal', selectedTodo);
         this.setState({
             showModal: true,
             selectedTodo: selectedTodo
         });
     }
 
-    closeModal() {
+    closeModal() { // 모달 닫기
         this.setState({
             showModal: false,
             selectedTodo: null
@@ -129,6 +131,7 @@ class App extends React.Component {
                 {this.state.showModal && (
                     <Detail
                         selectedTodo={this.state.selectedTodo}
+                        onCreate={this.handleCreate}
                         onClose={this.closeModal}
                     />
                 )}
