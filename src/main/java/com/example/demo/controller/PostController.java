@@ -45,7 +45,7 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updatePost(@PathVariable Long id, @RequestBody Post post) throws Exception{
-        Post data = postService.getPostById(id);
+            Post data = postService.getPostById(id);
 
         Boolean isComplete = post.getIsComplete();
         data.setIsComplete(isComplete);

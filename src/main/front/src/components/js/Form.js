@@ -31,7 +31,7 @@ const Form = ({ onCreate }) => {
                 placeholder="오늘 할 일을 입력하세요."
                 onChange={handleChange}
                 onKeyPress={handleKeyPress} />
-            <div className="create-button" onClick={() => {
+            <div className="create-button" onClick={()  => {
                 onCreate(input);
                 setInput('');
             }

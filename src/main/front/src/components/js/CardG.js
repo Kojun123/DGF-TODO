@@ -5,11 +5,11 @@ import TodoItem from "./TodoItem";
 class CardG extends React.Component {
     render() { 
         const { todos, onToggle, onRemove, openModal } = this.props; // 비구조화 할당 (순서대로, 이름은 동일 할 필요가 없다. 그러나 가독성이 향상됨.)
-        const todoCards = todos.map(({ id, content, isComplete }) => (
+        const todoCards = todos.map(({ id, title, content, isComplete }) => (
             <Col key={id}>
-                <Card onClick={() => openModal({ id, content, isComplete })}>
+                <Card onClick={() => openModal({ id, title, content, isComplete })}>
                     <Card.Body>
-                        <Card.Title>{content}</Card.Title>
+                        <Card.Title>{title}</Card.Title>
                         <Card.Text></Card.Text>
                         <TodoItem
                             id={id}
